@@ -757,10 +757,7 @@ function addMessage(sender, text) {
     div.id = senderId;
 
     const senderLabel = sender === 'sofia'
-        ? '🎓 Sofia <span class="speaking-indicator" id="si-' + senderId + '" 
-style="display:none"><span class="speaking-bar"></span><span 
-class="speaking-bar"></span><span class="speaking-bar"></span><span 
-class="speaking-bar"></span><span class="speaking-bar"></span></span>'
+        ? '🎓 Sofia <span class="speaking-indicator" id="si-' + senderId + '" style="display:none"><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span></span>'
         : '👤 You';
 
     div.innerHTML =
