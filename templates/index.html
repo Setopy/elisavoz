@@ -141,15 +141,15 @@ margin-top: 4px; }
         .chat-avatar {
             width: 40px; height: 40px; border-radius: 50%;
             background: linear-gradient(135deg, #e94560, #f5a623);
-            display: flex; align-items: center; justify-content: center; font-size: 
-1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
         }
         .chat-sofia-info h3 { font-size: 1rem; font-weight: 700; }
         .chat-sofia-info p { font-size: 0.75rem; color: #a0aec0; }
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 20px;
             display: flex; flex-direction: column; gap: 16px;
-            height: calc(100vh - 140px);
+            height: calc(100vh - 150px);
         }
         .message { max-width: 80%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn {
@@ -176,6 +176,10 @@ margin-top: 4px; }
             margin-bottom: 4px; padding: 0 4px;
         }
         .message.user .message-sender { text-align: right; }
+        .voice-status {
+            text-align: center; font-size: 0.8rem;
+            color: #e94560; padding: 4px 0; min-height: 20px;
+        }
         .chat-input-area {
             padding: 12px 16px; background: rgba(0,0,0,0.3);
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -210,15 +214,18 @@ margin-top: 4px; }
             background: #e94560;
             animation: pulse 1s infinite;
         }
-        .btn-end-session {
-            padding: 8px 14px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05); color: #fff;
-            font-size: 0.8rem; cursor: pointer; transition: all 0.3s; white-space: 
-nowrap;
+        .btn-speaker {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff; font-size: 1.2rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; flex-shrink: 0;
         }
-        .btn-end-session:hover { background: rgba(233,69,96,0.2); border-color: 
-#e94560; }
+        .btn-speaker:hover { background: rgba(255,255,255,0.2); }
+        .btn-speaker.speaking {
+            background: rgba(245,166,35,0.4);
+            animation: pulse 1s infinite;
+        }
         #summary-screen { padding: 20px; align-items: center; }
         .summary-content { max-width: 600px; width: 100%; }
         .summary-header { text-align: center; margin-bottom: 24px; }
@@ -250,8 +257,10 @@ rgba(72,199,142,0.05));
         .progress-mini .progress-bar-container { flex: 1; }
         .progress-mini .progress-label { font-size: 0.85rem; color: #a0aec0; 
 margin-bottom: 6px; }
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); 
-border-radius: 4px; overflow: hidden; }
+        .progress-bar {
+            height: 8px; background: rgba(255,255,255,0.1);
+            border-radius: 4px; overflow: hidden;
+        }
         .progress-fill {
             height: 100%; background: linear-gradient(135deg, #e94560, #f5a623);
             border-radius: 4px; transition: width 1s ease;
@@ -305,10 +314,6 @@ margin-bottom: 24px; }
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-6px); opacity: 1; }
-        }
-        .voice-status {
-            text-align: center; font-size: 0.8rem;
-            color: #e94560; padding: 4px 0; min-height: 20px;
         }
         @media (max-width: 480px) {
             .logo h1 { font-size: 2rem; }
@@ -426,6 +431,9 @@ margin-bottom: 24px; }
                 <p id="chat-subtitle">ElisaVoz Tutor</p>
             </div>
         </div>
+        <button class="btn-speaker" id="speaker-btn"
+                onclick="toggleSpeaker()"
+                title="Toggle Sofia's voice">🔊</button>
         <button class="btn-end-session" onclick="endSession()">
             End Session
         </button>
@@ -501,6 +509,8 @@ let currentMode = 'free';
 let currentLesson = null;
 let recognition = null;
 let isListening = false;
+let speakerOn = true;
+let isSpeaking = false;
 const curriculum = {{ curriculum | tojson }};
 
 function showScreen(id) {
@@ -573,7 +583,9 @@ async function startLesson(lessonId) {
     await fetch('/api/set_lesson', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({lesson_id: lessonId, mode: 'lesson'})
+        body: JSON.stringify({
+            lesson_id: lessonId, mode: 'lesson'
+        })
     });
     currentLesson = curriculum[lessonId];
     currentMode = 'lesson';
@@ -618,6 +630,7 @@ async function startChat(mode) {
 }
 
 function openChat(openingMessage) {
+    window.speechSynthesis.cancel();
     const messages = document.getElementById('chat-messages');
     messages.innerHTML = '';
     addMessage('sofia', openingMessage);
@@ -638,6 +651,69 @@ function addMessage(sender, text) {
         '<div class="message-bubble">' + text + '</div>';
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
+    if (sender === 'sofia' && speakerOn) {
+        sofiaSpeak(text);
+    }
+}
+
+function sofiaSpeak(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+
+    // Extract Spanish lines only (odd lines in bilingual format)
+    const lines = text.split('\n').filter(l => l.trim());
+    const spanishLines = lines.filter((line, i) => i % 2 === 0);
+    const spanishText = spanishLines.join('. ');
+
+    if (!spanishText.trim()) return;
+
+    const utterance = new SpeechSynthesisUtterance(spanishText);
+    utterance.lang = 'es-ES';
+    utterance.rate = 0.85;
+    utterance.pitch = 1.1;
+    utterance.volume = 1.0;
+
+    // Find best Spanish voice
+    const voices = window.speechSynthesis.getVoices();
+    const spanishVoice =
+        voices.find(v => v.lang === 'es-ES' && 
+v.name.toLowerCase().includes('female')) ||
+        voices.find(v => v.lang === 'es-ES') ||
+        voices.find(v => v.lang.startsWith('es')) ||
+        null;
+    if (spanishVoice) utterance.voice = spanishVoice;
+
+    utterance.onstart = function() {
+        isSpeaking = true;
+        const btn = document.getElementById('speaker-btn');
+        if (btn) {
+            btn.classList.add('speaking');
+            btn.textContent = '🔊';
+        }
+    };
+
+    utterance.onend = function() {
+        isSpeaking = false;
+        const btn = document.getElementById('speaker-btn');
+        if (btn) {
+            btn.classList.remove('speaking');
+            btn.textContent = speakerOn ? '🔊' : '🔇';
+        }
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
+
+function toggleSpeaker() {
+    speakerOn = !speakerOn;
+    const btn = document.getElementById('speaker-btn');
+    if (!speakerOn) {
+        window.speechSynthesis.cancel();
+        btn.textContent = '🔇';
+        btn.classList.remove('speaking');
+    } else {
+        btn.textContent = '🔊';
+    }
 }
 
 function showTyping() {
@@ -666,6 +742,7 @@ async function sendMessage() {
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
     if (!message) return;
+    window.speechSynthesis.cancel();
     addMessage('user', message);
     input.value = '';
     showTyping();
@@ -684,6 +761,7 @@ function handleKeyPress(e) {
 }
 
 async function endSession() {
+    window.speechSynthesis.cancel();
     showTyping();
     const res = await fetch('/api/end_lesson', {
         method: 'POST',
@@ -722,16 +800,21 @@ async function showProgress() {
     const data = await res.json();
     if (data.error) return;
     const pct = Math.round(
-        (data.completed_lessons.length / data.total_lessons) * 100);
-    document.getElementById('progress-pct').textContent = pct + '%';
-    document.getElementById('progress-sessions').textContent =
-        data.profile.sessions + ' sessions | Streak: ' +
+        (data.completed_lessons.length /
+         data.total_lessons) * 100);
+    document.getElementById('progress-pct')
+        .textContent = pct + '%';
+    document.getElementById('progress-sessions')
+        .textContent = data.profile.sessions +
+        ' sessions | Streak: ' +
         data.profile.streak + ' days 🔥';
-    const list = document.getElementById('completed-lessons-list');
+    const list = document.getElementById(
+        'completed-lessons-list');
     if (data.completed_lessons.length === 0) {
         list.innerHTML =
-            '<p style="color:#a0aec0;text-align:center;padding:20px">' +
-            "No lessons completed yet - lets start! 🚀</p>";
+            '<p style="color:#a0aec0;text-align:center;' +
+            'padding:20px">No lessons completed yet - ' +
+            "lets start! 🚀</p>";
     } else {
         list.innerHTML = data.completed_lessons.map(l =>
             '<div class="completed-item">' +
@@ -761,6 +844,7 @@ function initVoice() {
 
     recognition.onstart = function() {
         isListening = true;
+        window.speechSynthesis.cancel();
         const btn = document.getElementById('mic-btn');
         btn.classList.add('listening');
         btn.textContent = '🔴';
@@ -776,7 +860,8 @@ function initVoice() {
              i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
         }
-        document.getElementById('chat-input').value = transcript;
+        document.getElementById('chat-input').value =
+            transcript;
     };
 
     recognition.onend = function() {
@@ -801,8 +886,9 @@ function initVoice() {
         btn.textContent = '🎤';
         document.getElementById('voice-status').textContent = '';
         if (event.error === 'not-allowed') {
-            document.getElementById('voice-status').textContent =
-                'Microphone access denied. Please allow in browser settings.';
+            document.getElementById('voice-status')
+                .textContent =
+                'Microphone denied. Allow in browser settings.';
         }
     };
 }
@@ -823,6 +909,11 @@ function toggleVoice() {
         }
     }
 }
+
+// Load voices when available
+window.speechSynthesis.onvoiceschanged = function() {
+    window.speechSynthesis.getVoices();
+};
 
 document.getElementById('name-input')
     .addEventListener('keypress', function(e) {
