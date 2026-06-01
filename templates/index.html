@@ -383,7 +383,7 @@ margin-bottom: 24px; }
     </div>
     <div class="sofia-avatar">🎓</div>
     <div class="welcome-text">
-        <h2>Hola! I'm Sofia 👋</h2>
+        <h2>Hola! I'm Isabel</h2>
         <p>Your personal AI Spanish tutor.<br>
         Every voice deserves to speak Spanish.<br>
         <em>Cada voz merece hablar español.</em></p>
@@ -431,7 +431,7 @@ margin-bottom: 24px; }
         <div class="menu-option" onclick="startChat('free')">
             <div class="option-emoji">💬</div>
             <h3>Free Talk</h3>
-            <p>Chat freely with Sofia</p>
+            <p>Chat freely with Isabel</p>
         </div>
         <div class="menu-option"
              onclick="showLessons('Core Language')">
@@ -478,14 +478,14 @@ margin-bottom: 24px; }
         <div class="chat-sofia-info">
             <div class="chat-avatar">🎓</div>
             <div>
-                <h3>Sofia</h3>
+                <h3>Isabel</h3>
                 <p id="chat-subtitle">ElisaVoz Tutor</p>
             </div>
         </div>
         <div class="chat-controls">
             <button class="btn-icon" id="speaker-btn"
                     onclick="toggleSpeaker()"
-                    title="Toggle Sofia voice">🔊</button>
+                    title="Toggle Isabel voice">🔊</button>
             <button class="btn-end-session"
                     style="padding:8px 12px;border-radius:20px;
                     border:1px solid rgba(255,255,255,0.2);
@@ -721,7 +721,7 @@ async function startChat(mode) {
         'continue': 'Continuing your journey'
     };
     document.getElementById('chat-subtitle').textContent =
-        subtitles[mode] || 'Sofia - ElisaVoz';
+        subtitles[mode] || 'Isabel - ElisaVoz';
     const name = currentProfile.name;
     const openings = {
         'free': 'Hola ' + name + '!\nHello ' + name +
@@ -756,7 +756,7 @@ function addMessage(sender, text) {
     div.id = senderId;
 
     const senderLabel = sender === 'sofia'
-        ? '🎓 Sofia <span class="speaking-indicator" id="si-' + senderId + '" style="display:none"><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span></span>'
+        ? '🎓 Isabel <span class="speaking-indicator" id="si-' + senderId + '" style="display:none"><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span><span class="speaking-bar"></span></span>'
         : '👤 You';
 
     div.innerHTML =
@@ -926,7 +926,7 @@ function showTyping() {
     div.className = 'message sofia';
     div.id = 'typing-indicator';
     div.innerHTML =
-        '<div class="message-sender">🎓 Sofia</div>' +
+        '<div class="message-sender">🎓 Isabel</div>' +
         '<div class="message-bubble">' +
         '<div class="typing-indicator">' +
         '<div class="typing-dot"></div>' +

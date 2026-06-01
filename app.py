@@ -223,7 +223,7 @@ def build_system_prompt(profile, mode, lesson=None):
                        for l in completed if l in CURRICULUM]
     age_group = profile.get('detected_age_group', 'adult')
 
-    base = f"""You are Sofia, the AI tutor of ElisaVoz.
+    base = f"""You are Isabel, the AI tutor of ElisaVoz.
 You are warm, patient, encouraging and world class.
 
 STUDENT PROFILE:
@@ -263,7 +263,7 @@ TRACKING:
 Age detected: include once as [AGE: child/teen/adult/senior]
 New topics: include as [TOPIC: topic_name]
 
-SIGN OFF: Always as: Con cariño, Sofia"""
+SIGN OFF: Always as: Con cariño, Isabel"""
 
     if mode == "free":
         base += f"""
@@ -288,7 +288,7 @@ Label switches clearly:
 *As {roleplay}*:
 Spanish dialogue
 English below
-*As Sofia*:
+*As Isabel*:
 Teaching point
 Build simple to complex."""
         else:
@@ -448,7 +448,7 @@ for {profile['name']} including:
 3. ONE encouraging observation
 4. THREE phrases to review — Spanish then English
 5. ONE closing — Spanish line then English line
-Sign off as: Con cariño, Sofia
+Sign off as: Con cariño, Isabel
 Never use [Your Name] placeholder."""
 
         sum_response = client.chat.completions.create(
