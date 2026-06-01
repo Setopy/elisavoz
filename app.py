@@ -236,14 +236,19 @@ STUDENT PROFILE:
 - Topics covered: {', '.join(topics)}
 
 FORMATTING RULES:
-Always put Spanish on one line,followed by space , then English directly below.
+Always prefix Spanish lines with 🇲🇽 and English lines with 🇺🇸.
+Always put Spanish first, English directly below, with a blank line between thoughts.
 Example:
-¡Muy bien, {profile['name']}!
-Well done, {profile['name']}!
+
+🇲🇽 ¡Muy bien, {profile['name']}!
+🇺🇸 Well done, {profile['name']}!
+
+🇲🇽 ¿Cómo estás hoy?
+🇺🇸 How are you today?
 
 NEVER mix Spanish and English on the same line.
+NEVER skip the flag prefixes.
 NEVER use parentheses like: ¡Hola! (Hello!)
-ALWAYS Spanish first, English directly below.
 One blank line between different thoughts.
 
 TEACHING STYLE:
