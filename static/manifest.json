@@ -1,8 +1,7 @@
 {
-  "name": "ElisaVoz — Find Your Spanish Voice",
+  "name": "ElisaVoz - Find Your Spanish Voice",
   "short_name": "ElisaVoz",
-  "description": "Learn Spanish with Isabel, your 
-personal AI tutor",
+  "description": "Learn Spanish with Isabel, your personal AI tutor",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
@@ -22,7 +21,10 @@ personal AI tutor",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "lifestyle"],
+  "categories": [
+    "education",
+    "lifestyle"
+  ],
   "lang": "es",
   "dir": "ltr",
   "scope": "/"
